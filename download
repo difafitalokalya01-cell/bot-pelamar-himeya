@@ -1,0 +1,11 @@
+# File sensitif — jangan diupload ke GitHub!
+credentials.json
+*.log
+*.json
+!requirements.txt
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.env
