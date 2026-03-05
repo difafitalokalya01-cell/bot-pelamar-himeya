@@ -1118,11 +1118,6 @@ def main():
         sys.exit(1)
     log.info("✓ Internet tersambung.\n")
 
-    # Cek credentials.json
-    if not os.path.exists(SHEETS_CONFIG["credentials_file"]):
-        log.critical(f"FATAL: File '{SHEETS_CONFIG['credentials_file']}' tidak ditemukan!")
-        sys.exit(1)
-
     # Koneksi Google Sheets
     log.info("Menghubungkan ke Google Sheets...")
     try:
