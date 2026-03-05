@@ -1119,7 +1119,19 @@ def main():
     if not wait_internet(max_attempts=5):
         log.critical("FATAL: Tidak ada koneksi internet.")
         sys.exit(1)
-    log.info("✓ Internet tersambung.\n")
+    log.info("✓ Internet tersambung.")
+
+    # Tampilkan IP server (untuk whitelist di Hostinger)
+    try:
+        req = urllib.request.Request("https://api.ipify.org?format=json")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            ip_data = json.loads(resp.read().decode())
+            server_ip = ip_data.get("ip", "tidak diketahui")
+            log.info(f"🌐 IP Server Railway: {server_ip}")
+            log.info(f"   → Tambahkan IP ini ke whitelist Hostinger!")
+    except Exception as e:
+        log.warning(f"  Tidak bisa cek IP server: {e}")
+    log.info("")
 
     # Koneksi Google Sheets
     log.info("Menghubungkan ke Google Sheets...")
