@@ -363,16 +363,32 @@ def connect_sheets(force=False):
     if not force and _sheet_state["mentah"] and elapsed < SHEET_REFRESH_MINUTES:
         return _sheet_state["mentah"], _sheet_state["bersih"]
 
-    cred_file = SHEETS_CONFIG["credentials_file"]
-    if not os.path.exists(cred_file):
-        raise FileNotFoundError(f"File '{cred_file}' tidak ditemukan!")
-
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     ]
-    creds = Credentials.from_service_account_file(cred_file, scopes=scopes)
-    gc    = gspread.authorize(creds)
+
+    # Coba baca credentials dari Environment Variable dulu (Railway)
+    # Kalau tidak ada, baca dari file credentials.json (PC lokal)
+    creds_json = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
+    if creds_json:
+        import json as _json
+        from google.oauth2.service_account import Credentials as _Creds
+        creds_info = _json.loads(creds_json)
+        creds = _Creds.from_service_account_info(creds_info, scopes=scopes)
+        log.info("  Credentials dari Environment Variable.")
+    else:
+        cred_file = SHEETS_CONFIG["credentials_file"]
+        if not os.path.exists(cred_file):
+            raise FileNotFoundError(
+                f"File '{cred_file}' tidak ditemukan!\n"
+                f"Solusi Railway: set env var GOOGLE_CREDENTIALS_JSON\n"
+                f"Solusi lokal  : letakkan credentials.json di folder yang sama"
+            )
+        creds = Credentials.from_service_account_file(cred_file, scopes=scopes)
+        log.info("  Credentials dari file credentials.json.")
+
+    gc = gspread.authorize(creds)
     sh    = gc.open_by_key(SHEETS_CONFIG["spreadsheet_id"])
 
     # Sheet mentah
