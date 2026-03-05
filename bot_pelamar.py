@@ -967,8 +967,11 @@ def fetch_emails(processed_ids, ws_mentah, stats):
 
     except imaplib.IMAP4.error as e:
         err = str(e)
-        if "AUTHENTICATIONFAILED" in err:
-            log.error("  ❌ Login IMAP gagal! Cek password di EMAIL_CONFIG.")
+        if "AUTHENTICATIONFAILED" in err or "LOGIN" in err:
+            log.error("  ❌ Login IMAP gagal! Kemungkinan penyebab:")
+            log.error("     1. Password salah di Environment Variable EMAIL_PASSWORD")
+            log.error("     2. Hostinger memblokir login dari IP server Railway")
+            log.error("     3. Perlu aktifkan akses IMAP di pengaturan Hostinger")
         else:
             log.error(f"  IMAP error: {e}")
     except socket.timeout:
@@ -1059,7 +1062,7 @@ def proses_deduplikasi(ws_mentah, ws_bersih):
 
         # Tulis data bersih mulai baris 2
         if data_bersih:
-            ws_bersih.update("A2", data_bersih)
+            ws_bersih.update(data_bersih, "A2")
 
         # Kembalikan data kolom G-L dengan batch update
         if email_ke_bot:
@@ -1079,13 +1082,13 @@ def proses_deduplikasi(ws_mentah, ws_bersih):
 
         # Statistik di kolom P (kolom 16) — jauh dari data, tidak menimpa apapun
         now = datetime.now().strftime("%d/%m/%Y %H:%M")
-        ws_bersih.update("P2:P6", [
+        ws_bersih.update([
             ["📊 Statistik"],
             [f"Diperbarui: {now}"],
             [f"Total unik: {len(data_bersih)} pelamar"],
             [f"Data mentah: {len(rows)} baris"],
             [f"Duplikat: {len(rows) - len(data_bersih)}"],
-        ])
+        ], "P2:P6")
 
         log.info(f"  ✓ {len(data_bersih)} unik dari {len(rows)} baris. Duplikat: {len(rows) - len(data_bersih)}")
         log.info(f"  ✓ Baris 1 tidak diubah (milik user).")
