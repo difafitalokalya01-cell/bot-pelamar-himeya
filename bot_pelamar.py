@@ -1514,9 +1514,21 @@ def kirim_smtp(cfg, email_tujuan, nama, posisi, platform, nama_hr, no_wa, tmpl=N
             buat_email_html(cfg, nama, posisi, platform, nama_hr, no_wa, tmpl),
             "html", "utf-8"))
         msg_bytes = msg.as_bytes()
-        with smtplib.SMTP_SSL(cfg["SMTP Host"], int(cfg.get("SMTP Port", "465"))) as s:
-            s.login(cfg["Email Pengirim"], cfg["Password Email"])
-            s.sendmail(cfg["Email Pengirim"], email_tujuan, msg_bytes)
+        port      = int(cfg.get("SMTP Port", "465"))
+        host      = cfg["SMTP Host"]
+        user      = cfg["Email Pengirim"]
+        pwd       = cfg["Password Email"]
+        if port == 465:
+            with smtplib.SMTP_SSL(host, port) as s:
+                s.login(user, pwd)
+                s.sendmail(user, email_tujuan, msg_bytes)
+        else:
+            with smtplib.SMTP(host, port, timeout=30) as s:
+                s.ehlo()
+                s.starttls()
+                s.ehlo()
+                s.login(user, pwd)
+                s.sendmail(user, email_tujuan, msg_bytes)
         simpan_ke_sent_folder(cfg, msg_bytes)
         return True, ""
     except smtplib.SMTPAuthenticationError:
