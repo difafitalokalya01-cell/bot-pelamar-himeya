@@ -1,11 +1,36 @@
-# File sensitif — jangan diupload ke GitHub!
+# File sensitif — JANGAN diupload ke GitHub
 credentials.json
+config_cache.json
+config_cache2.json
+
+# File state lokal — Railway pakai storage sendiri
+sent_ids.json
+sent_ids.json.tmp
+sent_ids_backup.json
+sent_ids2.json
+sent_ids2.json.tmp
+sent_ids2_backup.json
+processed_ids.json
+processed_ids.backup.json
+email_index.json
+email_index.backup.json
+
+# Log
 *.log
-*.json
-!requirements.txt
+*.log.*
+
+# Lock file
+bot.lock
+bot2.lock
 
 # Python cache
 __pycache__/
 *.py[cod]
 *.pyo
-.env
+
+# Backup patch
+*.bak
+
+# Windows
+Thumbs.db
+desktop.ini
